@@ -17,7 +17,7 @@ let gameState = 'menu';
 
 const PADDLE_WIDTH = 100;
 const PADDLE_HEIGHT = 10;
-const BALL_RADIUS = 5;
+const BALL_RADIUS = 8;
 const BRICK_ROWS = 5;
 const BRICK_COLUMNS = 8;
 const BRICK_WIDTH = 75;
@@ -25,8 +25,10 @@ const BRICK_HEIGHT = 20;
 const BRICK_PADDING = 10;
 const BRICK_OFFSET_TOP = 30;
 const BRICK_OFFSET_LEFT = 30;
-const PADDLE_SPEED = 8.05; // Increased by 15% from 7
+const PADDLE_SPEED = 8.05;
 const BALL_SPEED = 5;
+
+const COLORS = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff'];
 
 class Paddle {
     constructor() {
@@ -37,8 +39,11 @@ class Paddle {
     }
 
     draw() {
-        ctx.fillStyle = '#0095DD';
+        ctx.fillStyle = '#e94560';
         ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.strokeStyle = '#ff9ff3';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
 
     move(direction) {
@@ -65,8 +70,16 @@ class Ball {
     draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#0095DD';
+        ctx.fillStyle = '#54a0ff';
         ctx.fill();
+        ctx.closePath();
+
+        // Add glow effect
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius + 2, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(84, 160, 255, 0.5)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
         ctx.closePath();
     }
 
@@ -92,19 +105,14 @@ class Ball {
         const relativeIntersectX = (paddle.x + (paddle.width / 2)) - this.x;
         const normalizedRelativeIntersectionX = relativeIntersectX / (paddle.width / 2);
         
-        // Calculate the incoming angle
         const incomingAngle = Math.atan2(-this.dy, this.dx);
-        
-        // Calculate the new angle based on the impact point and incoming angle
-        const bounceAngle = normalizedRelativeIntersectionX * (Math.PI / 3); // Max angle: 60 degrees
+        const bounceAngle = normalizedRelativeIntersectionX * (Math.PI / 3);
         const newAngle = incomingAngle + bounceAngle;
 
-        // Set new velocity while maintaining the same speed
         const speed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
         this.dx = speed * Math.cos(newAngle);
         this.dy = -speed * Math.sin(newAngle);
 
-        // Ensure the ball is moving upwards
         if (this.dy > 0) {
             this.dy = -this.dy;
         }
@@ -112,18 +120,22 @@ class Ball {
 }
 
 class Brick {
-    constructor(x, y) {
+    constructor(x, y, color) {
         this.x = x;
         this.y = y;
         this.width = BRICK_WIDTH;
         this.height = BRICK_HEIGHT;
         this.status = 1;
+        this.color = color;
     }
 
     draw() {
         if (this.status === 1) {
-            ctx.fillStyle = '#0095DD';
+            ctx.fillStyle = this.color;
             ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(this.x, this.y, this.width, this.height);
         }
     }
 }
@@ -135,7 +147,7 @@ function initializeBricks() {
         for (let r = 0; r < BRICK_ROWS; r++) {
             const brickX = c * (BRICK_WIDTH + BRICK_PADDING) + BRICK_OFFSET_LEFT;
             const brickY = r * (BRICK_HEIGHT + BRICK_PADDING) + BRICK_OFFSET_TOP;
-            bricks[c][r] = new Brick(brickX, brickY);
+            bricks[c][r] = new Brick(brickX, brickY, COLORS[r % COLORS.length]);
         }
     }
     return bricks;
@@ -165,13 +177,20 @@ function collisionDetection() {
 }
 
 function drawScore() {
-    ctx.font = '16px Arial';
-    ctx.fillStyle = '#0095DD';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#e94560';
     ctx.fillText(`Score: ${score}`, 8, 20);
 }
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw background
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, '#1a1a2e');
+    gradient.addColorStop(1, '#16213e');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     paddle.draw();
     ball.draw();
@@ -224,9 +243,9 @@ async function submitScore() {
 async function updateHighScores() {
     const highScores = await backend.getHighScores();
     scoreList.innerHTML = '';
-    highScores.forEach(([name, score]) => {
+    highScores.forEach(([name, score], index) => {
         const li = document.createElement('li');
-        li.textContent = `${name}: ${score}`;
+        li.textContent = `${index + 1}. ${name}: ${score}`;
         scoreList.appendChild(li);
     });
 }

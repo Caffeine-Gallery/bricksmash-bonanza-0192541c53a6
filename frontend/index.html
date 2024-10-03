@@ -8,16 +8,14 @@
 </head>
 <body>
     <div id="game-container">
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
         <div id="menu">
             <h1>Brick Breaker</h1>
             <button id="startButton">Start Game</button>
-            <div id="highScores">
-                <h2>High Scores</h2>
-                <ol id="scoreList"></ol>
-            </div>
+            <h2>High Scores</h2>
+            <ul id="scoreList"></ul>
         </div>
-        <div id="gameOver" style="display: none;">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="gameOver">
             <h2>Game Over</h2>
             <p>Your score: <span id="finalScore"></span></p>
             <input type="text" id="playerName" placeholder="Enter your name">
