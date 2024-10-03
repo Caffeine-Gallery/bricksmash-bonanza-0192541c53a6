@@ -26,6 +26,7 @@ const BRICK_PADDING = 10;
 const BRICK_OFFSET_TOP = 30;
 const BRICK_OFFSET_LEFT = 30;
 const PADDLE_SPEED = 7;
+const BALL_SPEED = 5;
 
 class Paddle {
     constructor() {
@@ -56,8 +57,8 @@ class Ball {
     constructor() {
         this.x = canvas.width / 2;
         this.y = canvas.height - 30;
-        this.dx = 2;
-        this.dy = -2;
+        this.dx = 0;
+        this.dy = -BALL_SPEED;
         this.radius = BALL_RADIUS;
     }
 
@@ -80,11 +81,20 @@ class Ball {
             this.dy = -this.dy;
         } else if (this.y + this.dy > canvas.height - this.radius) {
             if (this.x > paddle.x && this.x < paddle.x + paddle.width) {
-                this.dy = -this.dy;
+                this.bounceOffPaddle();
             } else {
                 gameState = 'gameOver';
             }
         }
+    }
+
+    bounceOffPaddle() {
+        const relativeIntersectX = (paddle.x + (paddle.width / 2)) - this.x;
+        const normalizedRelativeIntersectionX = relativeIntersectX / (paddle.width / 2);
+        const bounceAngle = normalizedRelativeIntersectionX * (Math.PI / 3); // Max angle: 60 degrees
+
+        this.dx = BALL_SPEED * -Math.sin(bounceAngle);
+        this.dy = -BALL_SPEED * Math.cos(bounceAngle);
     }
 }
 
