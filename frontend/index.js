@@ -25,6 +25,7 @@ const BRICK_HEIGHT = 20;
 const BRICK_PADDING = 10;
 const BRICK_OFFSET_TOP = 30;
 const BRICK_OFFSET_LEFT = 30;
+const PADDLE_SPEED = 7;
 
 class Paddle {
     constructor() {
@@ -39,7 +40,18 @@ class Paddle {
         ctx.fillRect(this.x, this.y, this.width, this.height);
     }
 
-    move(mouseX) {
+    move(direction) {
+        if (direction === 'left') {
+            this.x -= PADDLE_SPEED;
+        } else if (direction === 'right') {
+            this.x += PADDLE_SPEED;
+        }
+
+        if (this.x < 0) this.x = 0;
+        if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
+    }
+
+    moveToX(mouseX) {
         this.x = mouseX - this.width / 2;
         if (this.x < 0) this.x = 0;
         if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
@@ -205,7 +217,17 @@ async function updateHighScores() {
 canvas.addEventListener('mousemove', (e) => {
     const relativeX = e.clientX - canvas.offsetLeft;
     if (relativeX > 0 && relativeX < canvas.width) {
-        paddle.move(relativeX);
+        paddle.moveToX(relativeX);
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (gameState === 'playing') {
+        if (e.key === 'ArrowLeft') {
+            paddle.move('left');
+        } else if (e.key === 'ArrowRight') {
+            paddle.move('right');
+        }
     }
 });
 
