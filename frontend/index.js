@@ -50,12 +50,6 @@ class Paddle {
         if (this.x < 0) this.x = 0;
         if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
     }
-
-    moveToX(mouseX) {
-        this.x = mouseX - this.width / 2;
-        if (this.x < 0) this.x = 0;
-        if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
-    }
 }
 
 class Ball {
@@ -213,13 +207,6 @@ async function updateHighScores() {
         scoreList.appendChild(li);
     });
 }
-
-canvas.addEventListener('mousemove', (e) => {
-    const relativeX = e.clientX - canvas.offsetLeft;
-    if (relativeX > 0 && relativeX < canvas.width) {
-        paddle.moveToX(relativeX);
-    }
-});
 
 document.addEventListener('keydown', (e) => {
     if (gameState === 'playing') {
