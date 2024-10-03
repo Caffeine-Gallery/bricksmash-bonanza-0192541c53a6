@@ -25,7 +25,7 @@ const BRICK_HEIGHT = 20;
 const BRICK_PADDING = 10;
 const BRICK_OFFSET_TOP = 30;
 const BRICK_OFFSET_LEFT = 30;
-const PADDLE_SPEED = 7;
+const PADDLE_SPEED = 8.05; // Increased by 15% from 7
 const BALL_SPEED = 5;
 
 class Paddle {
@@ -91,10 +91,23 @@ class Ball {
     bounceOffPaddle() {
         const relativeIntersectX = (paddle.x + (paddle.width / 2)) - this.x;
         const normalizedRelativeIntersectionX = relativeIntersectX / (paddle.width / 2);
+        
+        // Calculate the incoming angle
+        const incomingAngle = Math.atan2(-this.dy, this.dx);
+        
+        // Calculate the new angle based on the impact point and incoming angle
         const bounceAngle = normalizedRelativeIntersectionX * (Math.PI / 3); // Max angle: 60 degrees
+        const newAngle = incomingAngle + bounceAngle;
 
-        this.dx = BALL_SPEED * -Math.sin(bounceAngle);
-        this.dy = -BALL_SPEED * Math.cos(bounceAngle);
+        // Set new velocity while maintaining the same speed
+        const speed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
+        this.dx = speed * Math.cos(newAngle);
+        this.dy = -speed * Math.sin(newAngle);
+
+        // Ensure the ball is moving upwards
+        if (this.dy > 0) {
+            this.dy = -this.dy;
+        }
     }
 }
 
