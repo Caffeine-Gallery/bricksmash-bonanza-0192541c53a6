@@ -9,11 +9,14 @@ const finalScoreSpan = document.getElementById('finalScore');
 const playerNameInput = document.getElementById('playerName');
 const submitScoreButton = document.getElementById('submitScore');
 const scoreList = document.getElementById('scoreList');
+const muteButton = document.getElementById('muteButton');
+const volumeSlider = document.getElementById('volumeSlider');
 
 let gameLoop;
 let paddle, ball, bricks;
 let score = 0;
 let gameState = 'menu';
+let gameMusic;
 
 const PADDLE_WIDTH = 100;
 const PADDLE_HEIGHT = 10;
@@ -25,7 +28,7 @@ const BRICK_HEIGHT = 20;
 const BRICK_PADDING = 10;
 const BRICK_OFFSET_TOP = 30;
 const BRICK_OFFSET_LEFT = 30;
-const PADDLE_SPEED = 9.66; // Increased by 20% from 8.05
+const PADDLE_SPEED = 20;
 const BALL_SPEED = 5;
 
 const COLORS = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff'];
@@ -74,7 +77,6 @@ class Ball {
         ctx.fill();
         ctx.closePath();
 
-        // Add glow effect
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius + 2, 0, Math.PI * 2);
         ctx.strokeStyle = 'rgba(84, 160, 255, 0.5)';
@@ -111,9 +113,8 @@ class Ball {
 
         const speed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
         this.dx = speed * Math.cos(newAngle);
-        this.dy = -Math.abs(speed * Math.sin(newAngle)); // Ensure the ball always moves upward after bouncing
+        this.dy = -Math.abs(speed * Math.sin(newAngle));
 
-        // Ensure minimum vertical speed to prevent horizontal movement
         const minVerticalSpeed = 0.1 * speed;
         if (Math.abs(this.dy) < minVerticalSpeed) {
             this.dy = this.dy > 0 ? minVerticalSpeed : -minVerticalSpeed;
@@ -187,7 +188,6 @@ function drawScore() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw background
     const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
     gradient.addColorStop(0, '#1a1a2e');
     gradient.addColorStop(1, '#16213e');
@@ -222,6 +222,7 @@ function startGame() {
     bricks = initializeBricks();
     menu.style.display = 'none';
     canvas.style.display = 'block';
+    playGameMusic();
     draw();
 }
 
@@ -230,6 +231,7 @@ function endGame() {
     canvas.style.display = 'none';
     gameOverScreen.style.display = 'block';
     finalScoreSpan.textContent = score;
+    stopGameMusic();
 }
 
 async function submitScore() {
@@ -252,6 +254,38 @@ async function updateHighScores() {
     });
 }
 
+function initializeAudio() {
+    gameMusic = new Audio('path/to/your/8bit-music.mp3');
+    gameMusic.loop = true;
+    gameMusic.volume = 0.5;
+}
+
+function playGameMusic() {
+    if (gameMusic) {
+        gameMusic.play().catch(error => console.error('Error playing music:', error));
+    }
+}
+
+function stopGameMusic() {
+    if (gameMusic) {
+        gameMusic.pause();
+        gameMusic.currentTime = 0;
+    }
+}
+
+function toggleMute() {
+    if (gameMusic) {
+        gameMusic.muted = !gameMusic.muted;
+        muteButton.textContent = gameMusic.muted ? 'Unmute' : 'Mute';
+    }
+}
+
+function setVolume() {
+    if (gameMusic) {
+        gameMusic.volume = volumeSlider.value;
+    }
+}
+
 document.addEventListener('keydown', (e) => {
     if (gameState === 'playing') {
         if (e.key === 'ArrowLeft') {
@@ -264,6 +298,8 @@ document.addEventListener('keydown', (e) => {
 
 startButton.addEventListener('click', startGame);
 submitScoreButton.addEventListener('click', submitScore);
+muteButton.addEventListener('click', toggleMute);
+volumeSlider.addEventListener('input', setVolume);
 
-// Initialize high scores on page load
+initializeAudio();
 updateHighScores();

@@ -64,3 +64,12 @@ input[type="text"] {
 #scoreList li {
     margin-bottom: 5px;
 }
+
+#audioControls {
+    margin-top: 10px;
+}
+
+#volumeSlider {
+    width: 100px;
+    margin-left: 10px;
+}
