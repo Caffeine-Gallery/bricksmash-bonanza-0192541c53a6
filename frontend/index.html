@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brick Breaker</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="menu">
+            <h1>Brick Breaker</h1>
+            <button id="startButton">Start Game</button>
+            <div id="highScores">
+                <h2>High Scores</h2>
+                <ol id="scoreList"></ol>
+            </div>
+        </div>
+        <div id="gameOver" style="display: none;">
+            <h2>Game Over</h2>
+            <p>Your score: <span id="finalScore"></span></p>
+            <input type="text" id="playerName" placeholder="Enter your name">
+            <button id="submitScore">Submit Score</button>
+        </div>
+    </div>
+    <script type="module" src="index.js"></script>
+</body>
+</html>
