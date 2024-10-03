@@ -25,7 +25,7 @@ const BRICK_HEIGHT = 20;
 const BRICK_PADDING = 10;
 const BRICK_OFFSET_TOP = 30;
 const BRICK_OFFSET_LEFT = 30;
-const PADDLE_SPEED = 8.05;
+const PADDLE_SPEED = 9.66; // Increased by 20% from 8.05
 const BALL_SPEED = 5;
 
 const COLORS = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff'];
@@ -111,10 +111,12 @@ class Ball {
 
         const speed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
         this.dx = speed * Math.cos(newAngle);
-        this.dy = -speed * Math.sin(newAngle);
+        this.dy = -Math.abs(speed * Math.sin(newAngle)); // Ensure the ball always moves upward after bouncing
 
-        if (this.dy > 0) {
-            this.dy = -this.dy;
+        // Ensure minimum vertical speed to prevent horizontal movement
+        const minVerticalSpeed = 0.1 * speed;
+        if (Math.abs(this.dy) < minVerticalSpeed) {
+            this.dy = this.dy > 0 ? minVerticalSpeed : -minVerticalSpeed;
         }
     }
 }
